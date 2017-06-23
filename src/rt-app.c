@@ -462,12 +462,8 @@ int run(int ind,
 		if (!continue_running && !lock)
 			return perf;
 
-		log_debug("[%d] runs events %d type %d %s ", ind, i, events[i].type,
+		log_ftrace("[%d] runs events %d type %d (%s) ", ind, i, events[i].type,
 			  ( resource_to_string(events[i].type, type_name), type_name) );
-		if (opts.ftrace)
-				log_ftrace(ft_data.marker_fd,
-						"[%d] executing %d",
-						ind, i);
 		lock += run_event(&events[i], !continue_running, &perf,
 				  resources, t_first, ldata, ind);
 	}
@@ -503,7 +499,7 @@ shutdown(int sig)
 	}
 
 	if (opts.ftrace) {
-		log_ftrace(ft_data.marker_fd, "main ends\n");
+		log_ftrace("main ends\n");
 		log_notice("deconfiguring ftrace");
 		close(ft_data.marker_fd);
 	}
@@ -778,10 +774,8 @@ void *thread_body(void *arg)
 		 * timestamp.
 		 */
 		clock_gettime(CLOCK_MONOTONIC, &t_zero);
-		if (opts.ftrace)
-			log_ftrace(ft_data.marker_fd,
-				"[%d] sets zero time",
-				data->ind);
+		log_ftrace("[%d] sets zero time",
+			   data->ind);
 	}
 
 	pthread_barrier_wait(&threads_barrier);
@@ -794,8 +788,7 @@ void *thread_body(void *arg)
 				   "start", "end", "rel_st", "slack",
 				   "c_duration", "c_period", "wu_lat");
 
-	if (opts.ftrace)
-		log_ftrace(ft_data.marker_fd, "[%d] starts", data->ind);
+	log_ftrace("[%d] starts", data->ind);
 
 	if (data->delay > 0) {
 		struct timespec delay = usec_to_timespec(data->delay);
@@ -834,10 +827,8 @@ void *thread_body(void *arg)
 		set_thread_affinity(data, &pdata->cpu_data);
 		set_thread_priority(data, pdata->sched_data);
 
-		if (opts.ftrace)
-			log_ftrace(ft_data.marker_fd,
-				   "[%d] begins thread_loop %d phase %d phase_loop %d",
-				   data->ind, thread_loop, phase, phase_loop);
+		log_ftrace("[%d] begins thread_loop %d phase %d phase_loop %d",
+			   data->ind, thread_loop, phase, phase_loop);
 		log_debug("[%d] begins thread_loop %d phase %d phase_loop %d",
 			  data->ind, thread_loop, phase, phase_loop);
 
@@ -870,10 +861,8 @@ void *thread_body(void *arg)
 		if (opts.logsize && !timings && continue_running)
 			log_timing(data->log_handler, curr_timing);
 
-		if (opts.ftrace)
-			log_ftrace(ft_data.marker_fd,
-				   "[%d] end thread_loop %d phase %d phase_loop %d",
-				   data->ind, thread_loop, phase, phase_loop);
+		log_ftrace("[%d] end thread_loop %d phase %d phase_loop %d",
+			   data->ind, thread_loop, phase, phase_loop);
 
 		phase_loop++;
 		/* Reached the specified number of loops for this phase. */
@@ -925,8 +914,7 @@ void *thread_body(void *arg)
 	}
 
 
-	if (opts.ftrace)
-		log_ftrace(ft_data.marker_fd, "[%d] exiting", data->ind);
+	log_ftrace("[%d] exiting", data->ind);
 
 	log_notice("[%d] Exiting.", data->ind);
 	fclose(data->log_handler);
@@ -971,7 +959,7 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 
-		log_ftrace(ft_data.marker_fd, "main creates threads\n");
+		log_ftrace("main creates threads\n");
 	}
 
 	/* Init global running_variable */
@@ -1150,8 +1138,7 @@ int main(int argc, char* argv[])
 
 	if (opts.duration > 0) {
 		sleep(opts.duration);
-		if (opts.ftrace)
-			log_ftrace(ft_data.marker_fd, "main shutdown\n");
+		log_ftrace("main shutdown\n");
 		shutdown(SIGTERM);
 	}
 
@@ -1160,7 +1147,7 @@ int main(int argc, char* argv[])
 	}
 
 	if (opts.ftrace) {
-		log_ftrace(ft_data.marker_fd, "main ends\n");
+		log_ftrace("main ends\n");
 		close(ft_data.marker_fd);
 	}
 	exit(EXIT_SUCCESS);
