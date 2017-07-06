@@ -51,7 +51,7 @@ do {                                                                    \
     if (level <= LOG_LEVEL) {                                           \
         struct timespec t_now;                                          \
         clock_gettime(CLOCK_MONOTONIC, &t_now);                         \
-        fprintf(where, LOG_PREFIX level_pfx " %06ld.%09ld " msg "\n", t_now.tv_sec, t_now.tv_nsec, ##args);		\
+        fprintf(where, LOG_PREFIX "[%06ld.%09ld] " level_pfx msg "\n", t_now.tv_sec, t_now.tv_nsec, ##args);		\
     }                                                                   \
 } while (0);
 
@@ -60,7 +60,7 @@ do {                                                                    \
     if (level <= LOG_LEVEL) {                                           \
         struct timespec t_now;                                          \
         clock_gettime(CLOCK_MONOTONIC, &t_now);                         \
-        fprintf(where, LOG_PREFIX level_pfx " %06ld.%09ld " msg "\n", t_now.tv_sec, t_now.tv_nsec, ##args); \
+        fprintf(where, LOG_PREFIX "[%06ld.%09ld] " level_pfx msg "\n", t_now.tv_sec, t_now.tv_nsec, ##args); \
         if(ft_data.marker_fd != -1) {                                   \
             ftrace_write(ft_data.marker_fd, msg, ##args);               \
         }                                                               \
